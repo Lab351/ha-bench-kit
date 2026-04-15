@@ -1,0 +1,168 @@
+version: 1
+# ###
+# Generic devices
+# ###
+# devices:
+#   Test Motion Sensor:
+#     - platform: binary_sensor
+#       class: motion
+#       initial_value: "off"
+
+#   Test Temperature Sensor:
+#     - platform: sensor
+#       class: temperature
+#       initial_value: 22
+#       unit_of_measurement: "C"
+
+#   Test Light:
+#     - platform: light
+#       initial_value: "on"
+#       support_brightness: true
+#       initial_brightness: 100
+
+#   Test Door Lock:
+#     - platform: lock
+#       initial_value: locked
+
+#   Test Fan:
+#     - platform: fan
+#       speed_count: 5
+#       direction: true
+#       oscillate: true
+
+#   Test Cover:
+#     - platform: cover
+#       initial_value: "closed"
+#       open_close_duration: 10
+#       open_close_tick: 1
+
+# ###
+# Hass-virtual does not support climate entities. So we would mock them using a combination of sensors and switches.
+# ###
+#  Mock AC Backend:
+#   - platform: switch
+#     name: Mock AC Power
+#     initial_value: "off"
+#     persistent: true
+
+#   - platform: sensor
+#     name: Mock AC Current Temperature
+#     class: temperature
+#     initial_value: 26
+#     unit_of_measurement: "°C"
+#     persistent: true
+
+devices:
+  Bedroom Main Light:
+    - platform: light
+      initial_value: "on"
+      support_brightness: false
+
+  Bedroom Lamp:
+    - platform: light
+      initial_value: "off"
+      support_brightness: true
+      initial_brightness: 50
+
+  Bedroom Temperature Sensor:
+    - platform: sensor
+      class: temperature
+      initial_value: 20
+      unit_of_measurement: "C"
+
+    - platform: sensor
+      class: humidity
+      initial_value: 40
+      unit_of_measurement: "%"
+
+  Bedroom Motion Sensor:
+    - platform: binary_sensor
+      class: motion
+      initial_value: "off"
+    - platform: sensor
+      initial_value: "98"
+      class: battery
+
+  _Bedroom Mock AC Power:
+    - platform: switch
+      initial_value: "off"
+      persistent: true
+
+  _Bedroom Mock AC Current Temperature:
+    - platform: sensor
+      class: temperature
+      initial_value: 24
+      unit_of_measurement: "C"
+      persistent: true
+
+  Bedroom Curtain:
+    - platform: cover
+      initial_value: "closed"
+      open_close_duration: 10
+      open_close_tick: 1
+
+  Bedroom Window Contact Sensor:
+    - platform: binary_sensor
+      class: opening
+      initial_value: "off"
+    - platform: sensor
+      initial_value: "75"
+      class: battery
+
+  Living Room Ceiling Light Front:
+    - platform: light
+      initial_value: "off"
+      support_brightness: false
+
+  Living Room Ceiling Light Back:
+    - platform: light
+      initial_value: "off"
+      support_brightness: false
+
+  Living Room Motion Sensor:
+    - platform: binary_sensor
+      class: motion
+      initial_value: "off"
+    - platform: sensor
+      initial_value: "45"
+      class: battery
+
+  Living Room Floor Lamp:
+    - platform: light
+      initial_value: "off"
+      support_brightness: true
+      initial_brightness: 35
+
+  Living Room Ambient Sensor:
+    - platform: sensor
+      class: illuminance
+      initial_value: 120
+      unit_of_measurement: "lx"
+
+    - platform: sensor
+      class: humidity
+      initial_value: 48
+      unit_of_measurement: "%"
+
+  Front Door Lock:
+    - platform: lock
+      initial_value: locked
+
+  Kitchen Ceiling Light:
+    - platform: light
+      initial_value: "off"
+      support_brightness: false
+
+  Kitchen Counter Light:
+    - platform: light
+      initial_value: "off"
+      support_brightness: true
+      initial_brightness: 60
+
+  Kitchen Motion Sensor:
+    - platform: binary_sensor
+      class: motion
+      initial_value: "off"
+    - platform: sensor
+      initial_value: "58"
+      class: battery
