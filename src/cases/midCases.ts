@@ -185,7 +185,11 @@ export const MID_CASES: HassTestCase[] = [
     },
     check: [
       assertNonEmptyFinalResponse(),
-      assertIncludesAll(["卧室", "窗", "窗帘"]),
+      assertIncludesAll([
+        ["卧室", "房间"],
+        ["窗", "窗户"],
+        ["窗帘", "帘子"],
+      ]),
       assertEntityState(HASS_ENTITY_IDS.bedroomCurtain, "closed"),
       assertEntityState(HASS_ENTITY_IDS.bedroomWindow, "off"),
     ],

@@ -3,6 +3,8 @@ import type {
   CheckResult,
 } from "../cases/schema.js";
 
+export type KeywordExpectation = string | string[];
+
 export function assertNonEmptyFinalResponse(
   reason = "A2A service returned an empty final text response.",
 ) {
@@ -32,17 +34,31 @@ export function assertFinalResponseMatches(
 }
 
 export function assertIncludesAll(
-  keywords: string[],
+  keywords: KeywordExpectation[],
   reason?: string,
 ) {
   return async ({ finalResponseText }: CheckContext): Promise<CheckResult> => {
-    const missing = keywords.filter((keyword) => !finalResponseText.includes(keyword));
+    const missing = keywords.filter((keywordGroup) => {
+      const alternatives = Array.isArray(keywordGroup)
+        ? keywordGroup
+        : [keywordGroup];
+
+      return !alternatives.some((keyword) =>
+        finalResponseText.includes(keyword),
+      );
+    });
 
     return {
       pass: missing.length === 0,
       reason:
         reason ??
-        `Final response is missing expected keywords: ${missing.join(", ")}.`,
+        `Final response is missing expected keywords: ${missing
+          .map((keywordGroup) =>
+            Array.isArray(keywordGroup)
+              ? `[${keywordGroup.join(" | ")}]`
+              : keywordGroup,
+          )
+          .join(", ")}.`,
       details: {
         finalResponseText,
         keywords,

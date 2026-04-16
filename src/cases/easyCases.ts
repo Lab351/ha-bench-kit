@@ -66,7 +66,7 @@ export const EASY_TEST_CASES: HassTestCase[] = [
     },
     check: [
       assertNonEmptyFinalResponse(),
-      assertIncludesAll(["锁"]),
+      assertIncludesAll([["锁", "门锁"], ["已上锁", "锁着", "锁定"]]),
       assertEntityState(HASS_ENTITY_IDS.frontDoorLock, "locked"),
     ],
   },
@@ -77,7 +77,10 @@ export const EASY_TEST_CASES: HassTestCase[] = [
     prepare: async () => {},
     check: [
       assertNonEmptyFinalResponse(),
-      assertIncludesAll(["没有", "运动"]),
+      assertIncludesAll([
+        ["没有", "没人", "无人", "未检测到"],
+        ["运动", "经过", "人"],
+      ]),
       assertEntityState(HASS_ENTITY_IDS.kitchenMotion, "off"),
     ],
   },
@@ -88,7 +91,7 @@ export const EASY_TEST_CASES: HassTestCase[] = [
     prepare: async () => {},
     check: [
       assertNonEmptyFinalResponse(),
-      assertIncludesAll(["窗", "关"]),
+      assertIncludesAll([["窗", "窗户"], ["关", "关闭", "关着", "没开"]]),
       assertEntityState(HASS_ENTITY_IDS.bedroomWindow, "off"),
     ],
   },
