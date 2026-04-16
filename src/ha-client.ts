@@ -24,6 +24,8 @@ export type HaClientOptions = {
 
 export type EntityStateListener = (entities: Readonly<HassEntities>) => void;
 
+const INITIAL_SNAPSHOT_TIMEOUT_MS = 10_000;
+
 export class HaWsClient {
   static async connect(options: HaClientOptions): Promise<HaWsClient> {
     const auth = createLongLivedTokenAuth(options.hassUrl, options.accessToken);
@@ -41,7 +43,7 @@ export class HaWsClient {
     });
 
     const client = new HaWsClient(auth, connection);
-    client.startEntitySubscription();
+    await client.startEntitySubscription();
     return client;
   }
 
@@ -95,16 +97,34 @@ export class HaWsClient {
     await callService(this.connection, domain, service, serviceData, target);
   }
 
-  private startEntitySubscription(): void {
-    this.unsubscribeEntities = subscribeEntities(
-      this.connection,
-      (entities: HassEntities) => {
-        this.entities = entities;
+  private async startEntitySubscription(): Promise<void> {
+    let hasResolvedInitialSnapshot = false;
 
-        for (const listener of this.listeners) {
-          listener(this.entities);
-        }
-      },
-    );
+    await new Promise<void>((resolve, reject) => {
+      const timer = setTimeout(() => {
+        reject(
+          new Error(
+            `Timed out after ${INITIAL_SNAPSHOT_TIMEOUT_MS}ms waiting for the initial HA entity snapshot.`,
+          ),
+        );
+      }, INITIAL_SNAPSHOT_TIMEOUT_MS);
+
+      this.unsubscribeEntities = subscribeEntities(
+        this.connection,
+        (entities: HassEntities) => {
+          this.entities = entities;
+
+          if (!hasResolvedInitialSnapshot) {
+            hasResolvedInitialSnapshot = true;
+            clearTimeout(timer);
+            resolve();
+          }
+
+          for (const listener of this.listeners) {
+            listener(this.entities);
+          }
+        },
+      );
+    });
   }
 }
