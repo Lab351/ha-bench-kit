@@ -1,24 +1,7 @@
 import "dotenv/config";
-import { EASY_TEST_CASES } from "./cases/easyCases.js";
 
-export {
-  BENCHMARK_LIGHTS,
-  BENCHMARK_SWITCHES,
-} from "./benchmark-config.js";
-export {
-  EntityHandle,
-  LightHandle,
-  SwitchHandle,
-  connectBenchmarkKit,
-  createBenchmarkKit,
-  type BenchmarkKit,
-} from "./benchmark-runtime.js";
-export {
-  HaWsClient,
-  type HaClientOptions,
-} from "./ha-client.js";
-export { runBenchmarkSuite, type RunBenchmarkSuiteOptions } from "./runner/runBenchmarkSuite.js";
-import { runBenchmarkSuite } from "./runner/runBenchmarkSuite.js";
+import { EASY_TEST_CASES } from "../cases/easyCases.js";
+import { runBenchmarkSuite } from "./runBenchmarkSuite.js";
 
 function requireEnv(name: "HA_URL" | "HA_TOKEN"): string {
   const value = process.env[name];
