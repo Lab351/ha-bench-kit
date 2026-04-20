@@ -29,7 +29,6 @@ export type A2ATranscriptTurn = {
 };
 
 export type BenchmarkRunContext = {
-  readonly suiteId: string;
   readonly benchmark: BenchmarkKit;
   readonly a2aClient: Client;
   readonly a2aServiceUrl: string;
@@ -74,7 +73,6 @@ export type CaseRunResult = {
 };
 
 export type BenchmarkSuiteResult = {
-  suiteId: string;
   a2aServiceUrl: string;
   total: number;
   passed: number;

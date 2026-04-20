@@ -9,7 +9,6 @@ export const HASS_ENTITY_IDS = {
   kitchenMotion: "binary_sensor.kitchen_motion_sensor_motion",
   livingRoomMotion: "binary_sensor.living_room_motion_sensor_motion",
   bedroomWindow: "binary_sensor.bedroom_window_contact_sensor_opening",
-  frontDoorLock: "lock.front_door_lock",
   bedroomCurtain: "cover.bedroom_curtain_cover",
 } as const;
 
@@ -42,10 +41,27 @@ export function assertEntityState(
   };
 }
 
-export async function lockFrontDoor(benchmark: BenchmarkKit): Promise<void> {
-  await benchmark.client.callDomainService("lock", "lock", {
-    entity_id: HASS_ENTITY_IDS.frontDoorLock,
-  });
+export function assertEntityStateOneOf(
+  entityId: string,
+  expectedStates: string[],
+  reason?: string,
+) {
+  return async ({ benchmark }: CheckContext): Promise<CheckResult> => {
+    const actualState = getEntityState(benchmark, entityId);
+    const pass = expectedStates.includes(actualState);
+
+    return {
+      pass,
+      reason:
+        reason ??
+        `Expected ${entityId} to be one of ${expectedStates.join(", ")}, received ${actualState}.`,
+      details: {
+        entityId,
+        expectedStates,
+        actualState,
+      },
+    };
+  };
 }
 
 export async function closeBedroomCurtain(benchmark: BenchmarkKit): Promise<void> {

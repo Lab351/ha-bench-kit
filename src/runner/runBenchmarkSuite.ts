@@ -15,8 +15,15 @@ import {
   runA2AConversation,
 } from "../a2a/client.js";
 
+const CASE_SETTLE_DELAY_MS = 3_000;
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 export type RunBenchmarkSuiteOptions = {
-  suiteId: string;
   a2aServiceUrl: string;
   hassUrl: string;
   accessToken: string;
@@ -52,7 +59,6 @@ function aggregateCheckResults(results: NormalizedCheckResult[]): {
 async function runCase(args: {
   testCase: NormalizedHassTestCase;
   caseIndex: number;
-  suiteId: string;
   benchmark: Awaited<ReturnType<typeof connectBenchmarkKit>>;
   a2aClient: Client;
   a2aServiceUrl: string;
@@ -60,7 +66,6 @@ async function runCase(args: {
   const {
     testCase,
     caseIndex,
-    suiteId,
     benchmark,
     a2aClient,
     a2aServiceUrl,
@@ -69,7 +74,6 @@ async function runCase(args: {
   const startedAtMs = Date.now();
 
   const baseContext = {
-    suiteId,
     benchmark,
     a2aClient,
     a2aServiceUrl,
@@ -136,19 +140,21 @@ export async function runBenchmarkSuite(
         await runCase({
           testCase,
           caseIndex,
-          suiteId: options.suiteId,
           benchmark,
           a2aClient,
           a2aServiceUrl: options.a2aServiceUrl,
         }),
       );
+
+      if (caseIndex < normalizedCases.length - 1) {
+        await sleep(CASE_SETTLE_DELAY_MS);
+      }
     }
 
     const passed = results.filter((result) => result.pass).length;
     const finishedAt = new Date().toISOString();
 
     return {
-      suiteId: options.suiteId,
       a2aServiceUrl: options.a2aServiceUrl,
       total: results.length,
       passed,

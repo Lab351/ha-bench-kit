@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { ALL_TEST_CASES, TEST_CASE_SUITES } from "./cases/index.js";
+import { TEST_CASES } from "./cases/index.js";
 import type { HassTestCase } from "./cases/schema.js";
 
 export {
@@ -42,28 +42,16 @@ function requireArg(flag: "--a2a-url"): string {
   return value;
 }
 
-function optionalArg(flag: "--suite" | "--case-id"): string | undefined {
+function optionalArg(flag: "--case-id"): string | undefined {
   const index = process.argv.indexOf(flag);
   return index >= 0 ? process.argv[index + 1] : undefined;
 }
 
-function resolveCases(): { suiteId: string; cases: HassTestCase[] } {
-  const suiteArg = optionalArg("--suite") ?? "all";
-  const suiteCases = TEST_CASE_SUITES[suiteArg];
-
-  if (!suiteCases) {
-    throw new Error(
-      `Unknown suite "${suiteArg}". Supported values: ${Object.keys(TEST_CASE_SUITES).join(", ")}.`,
-    );
-  }
-
+function resolveCases(): HassTestCase[] {
   const caseIdArg = optionalArg("--case-id");
 
   if (!caseIdArg) {
-    return {
-      suiteId: suiteArg,
-      cases: suiteCases,
-    };
+    return TEST_CASES;
   }
 
   const requestedIds = caseIdArg
@@ -71,7 +59,7 @@ function resolveCases(): { suiteId: string; cases: HassTestCase[] } {
     .map((part) => part.trim())
     .filter(Boolean);
   const requestedIdSet = new Set(requestedIds);
-  const filteredCases = ALL_TEST_CASES.filter((testCase) =>
+  const filteredCases = TEST_CASES.filter((testCase) =>
     requestedIdSet.has(testCase.id),
   );
 
@@ -91,20 +79,16 @@ function resolveCases(): { suiteId: string; cases: HassTestCase[] } {
     );
   }
 
-  return {
-    suiteId: `${suiteArg}:filtered`,
-    cases: filteredCases,
-  };
+  return filteredCases;
 }
 
-const selected = resolveCases();
+const selectedCases = resolveCases();
 
 const result = await runBenchmarkSuite({
-  suiteId: selected.suiteId,
   a2aServiceUrl: requireArg("--a2a-url"),
   hassUrl: requireEnv("HA_URL"),
   accessToken: requireEnv("HA_TOKEN"),
-  cases: selected.cases,
+  cases: selectedCases,
 });
 
 console.log(JSON.stringify(result, null, 2));

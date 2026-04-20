@@ -1,6 +1,6 @@
 import "dotenv/config";
 
-import { EASY_TEST_CASES } from "../cases/easyCases.js";
+import { TEST_CASES } from "../cases/index.js";
 import { runBenchmarkSuite } from "./runBenchmarkSuite.js";
 
 function requireEnv(name: "HA_URL" | "HA_TOKEN"): string {
@@ -25,11 +25,10 @@ function requireArg(flag: "--a2a-url"): string {
 }
 
 const result = await runBenchmarkSuite({
-  suiteId: "easy",
   a2aServiceUrl: requireArg("--a2a-url"),
   hassUrl: requireEnv("HA_URL"),
   accessToken: requireEnv("HA_TOKEN"),
-  cases: EASY_TEST_CASES,
+  cases: TEST_CASES,
 });
 
 console.log(JSON.stringify(result, null, 2));
