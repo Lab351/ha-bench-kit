@@ -89,6 +89,9 @@ const result = await runBenchmarkSuite({
   hassUrl: requireEnv("HA_URL"),
   accessToken: requireEnv("HA_TOKEN"),
   cases: selectedCases,
+  onStatus: (status) => {
+    console.error(status.message);
+  },
 });
 
 console.log(JSON.stringify(result, null, 2));

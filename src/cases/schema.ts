@@ -16,10 +16,21 @@ export type CheckResult =
       details?: Record<string, unknown>;
     };
 
+export type CheckFn = (context: CheckContext) => Promise<CheckResult>;
+
+export type CheckDefinition = {
+  run: CheckFn;
+  points?: number;
+  label?: string;
+};
+
 export type NormalizedCheckResult = {
   pass: boolean;
   reason?: string;
   details?: Record<string, unknown>;
+  pointsAwarded: number;
+  pointsPossible: number;
+  label?: string;
 };
 
 export type A2ATranscriptTurn = {
@@ -32,6 +43,13 @@ export type BenchmarkRunContext = {
   readonly benchmark: BenchmarkKit;
   readonly a2aClient: Client;
   readonly a2aServiceUrl: string;
+};
+
+export type BenchmarkStatus = {
+  message: string;
+  caseId?: string;
+  caseIndex?: number;
+  totalCases?: number;
 };
 
 export type PreparedCaseContext = BenchmarkRunContext & {
@@ -53,19 +71,23 @@ export type HassTestCase = {
   description: string;
   query: ConversationTurn[] | string;
   prepare?: (context: PreparedCaseContext) => Promise<void>;
-  check: Array<(context: CheckContext) => Promise<CheckResult>>;
+  check: Array<CheckDefinition | CheckFn>;
 };
 
-export type NormalizedHassTestCase = Omit<HassTestCase, "query"> & {
+export type NormalizedHassTestCase = Omit<HassTestCase, "query" | "check"> & {
   query: ConversationTurn[];
+  check: CheckDefinition[];
 };
 
 export type CaseRunResult = {
   id: string;
   description: string;
   pass: boolean;
+  score: number;
+  maxScore: number;
   reasons: string[];
   details: Record<string, unknown>[];
+  checkResults: NormalizedCheckResult[];
   startedAt: string;
   finishedAt: string;
   durationMs: number;
@@ -77,6 +99,8 @@ export type BenchmarkSuiteResult = {
   total: number;
   passed: number;
   failed: number;
+  totalScore: number;
+  maxScore: number;
   startedAt: string;
   finishedAt: string;
   durationMs: number;

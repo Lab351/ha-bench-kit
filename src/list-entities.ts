@@ -48,7 +48,7 @@ async function main(): Promise<void> {
   try {
     const entityIds = await waitForEntitySnapshot(client);
 
-    console.log(`Loaded ${entityIds.length} entities:`);
+    console.error(`Loaded ${entityIds.length} entities:`);
 
     for (const entityId of entityIds) {
       console.log(entityId);
